@@ -1,0 +1,10 @@
+[project]
+name = "aeroroute"
+version = "0.1.0"
+description = "Historical domestic-flight reliability simulation infrastructure"
+requires-python = ">=3.11"
+dependencies = [
+    "airportsdata==20260905",
+    "pyarrow==25.0.1",
+    "tzdata==2026.4",
+]
