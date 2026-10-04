@@ -5,8 +5,9 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from aeroroute.data_snapshots import file_hash
-from aeroroute.preprocessing import normalize_month, publish_dataset
+from aeroroute.storage.identity import file_hash
+from aeroroute.normalization.pipeline import normalize_month
+from aeroroute.normalization.datasets import publish_dataset
 
 
 def flight_row(day="2020-01-01", **changes):

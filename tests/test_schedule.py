@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
 
 from access_fixtures import AccessFixture, flight_row
-from aeroroute.data_access import DatasetStore, build_lookup
-from aeroroute.service_resolution import ResolutionPolicy, ServiceCatalog, build_services
-from aeroroute.schedule import ScheduleStore, build_schedule
+from aeroroute.storage.dataset import DatasetStore
+from aeroroute.storage.lookup import build_lookup
+from aeroroute.catalog.services import ResolutionPolicy, ServiceCatalog, build_services
+from aeroroute.catalog.schedule import ScheduleStore, build_schedule
 
 
 class ScheduleTests(AccessFixture):

@@ -2,13 +2,14 @@ from dataclasses import replace
 from unittest.mock import patch
 
 from access_fixtures import AccessFixture, flight_row
-from aeroroute.data_access import DatasetStore, build_lookup
-from aeroroute.service_resolution import ResolutionPolicy, ServiceCatalog, build_services
-from aeroroute.schedule import ScheduleStore, build_schedule
-from aeroroute.sampling import (
-    EmpiricalProvider, ExactReplayProvider, MatchingPolicy, NoMatchingPool, PreparedPools,
-    Scenario, prepare_pools, prepare_replay, uniform_index,
-)
+from aeroroute.storage.dataset import DatasetStore
+from aeroroute.storage.lookup import build_lookup
+from aeroroute.catalog.services import ResolutionPolicy, ServiceCatalog, build_services
+from aeroroute.catalog.schedule import ScheduleStore, build_schedule
+from aeroroute.outcomes.draws import Scenario, uniform_index
+from aeroroute.outcomes.pools import MatchingPolicy, NoMatchingPool, PreparedPools, prepare_pools
+from aeroroute.outcomes.providers import EmpiricalProvider
+from aeroroute.outcomes.replay import ExactReplayProvider, prepare_replay
 
 
 class SamplingTests(AccessFixture):
@@ -138,7 +139,7 @@ class SamplingTests(AccessFixture):
                 self.value = value
             def digest(self):
                 return self.value.to_bytes(32, "big")
-        with patch("aeroroute.sampling.hashlib.sha256", side_effect=[FakeHash(2 ** 256 - 1), FakeHash(4)]) as mocked:
+        with patch("aeroroute.outcomes.draws.hashlib.sha256", side_effect=[FakeHash(2 ** 256 - 1), FakeHash(4)]) as mocked:
             self.assertEqual(uniform_index({"seed": 0}, 3), 1)
             self.assertEqual(mocked.call_count, 2)
 

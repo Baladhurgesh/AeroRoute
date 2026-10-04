@@ -1,4 +1,4 @@
-from .records import (
+from .domain.records import (
     AirportRef,
     DecisionStep,
     DiversionStop,

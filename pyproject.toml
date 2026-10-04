@@ -8,3 +8,9 @@ dependencies = [
     "pyarrow==25.0.1",
     "tzdata==2026.4",
 ]
+
+[project.optional-dependencies]
+rl = [
+    "gymnasium==1.2.0",
+    "numpy==2.3.3",
+]

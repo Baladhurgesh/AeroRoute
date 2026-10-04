@@ -2,8 +2,10 @@ from dataclasses import replace
 from unittest.mock import patch
 
 from access_fixtures import AccessFixture, flight_row
-from aeroroute.data_access import DatasetStore, build_lookup
-from aeroroute.data_snapshots import contained_path, load_json, verify_dataset, verify_derived
+from aeroroute.storage.dataset import DatasetStore
+from aeroroute.storage.lookup import build_lookup
+from aeroroute.storage.artifacts import contained_path, verify_dataset, verify_derived
+from aeroroute.storage.identity import load_json
 
 
 class DataAccessTests(AccessFixture):
@@ -119,8 +121,8 @@ class DataAccessTests(AccessFixture):
         lookup = build_lookup(snapshot, self.root / "lookups")
         manifest = load_json(lookup / "manifest.json")
         manifest["identity"]["lookup_version"] = 999
-        with patch("aeroroute.data_snapshots.load_json", return_value=manifest), \
-                patch("aeroroute.data_snapshots.digest", return_value=lookup.name):
+        with patch("aeroroute.storage.artifacts.load_json", return_value=manifest), \
+                patch("aeroroute.storage.artifacts.digest", return_value=lookup.name):
             with self.assertRaises(ValueError):
                 verify_derived(lookup, "lookup")
 

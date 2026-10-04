@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts import download_bts as bts
+from aeroroute.acquisition import bts
 
 
 COLUMNS = [

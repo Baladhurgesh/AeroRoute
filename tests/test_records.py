@@ -3,7 +3,7 @@ import unittest
 from dataclasses import FrozenInstanceError, replace
 from datetime import date, datetime, timedelta, timezone
 
-from aeroroute.records import (
+from aeroroute.domain.records import (
     AirportRef, DecisionStep, DiversionStop, EpisodeProvenance, EpisodeRecord,
     EpisodeSettings, FlightOption, FlightOutcome, HistoricalSampleRef,
     OutcomeStatus, ScheduleRef, SourceRecordRef, TerminalState, TerminationReason,
@@ -374,7 +374,7 @@ class EpisodeRecordTests(unittest.TestCase):
         self.assertEqual(EpisodeRecord.from_dict(record.to_dict()), record)
 
     def test_unknown_schema_or_fields_rejected(self):
-        for mutate in (lambda data: data.update(schema_version=2),
+        for mutate in (lambda data: data.update(schema_version=3),
                        lambda data: data.update(success=True),
                        lambda data: data["request"].update(unexpected=1)):
             data = episode().to_dict()

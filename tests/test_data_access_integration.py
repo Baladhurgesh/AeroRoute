@@ -3,8 +3,9 @@ import io
 from pathlib import Path
 
 from access_fixtures import AccessFixture
-from aeroroute.data_snapshots import load_json, verify_derived
-from scripts.build_data_access import main
+from aeroroute.storage.identity import load_json
+from aeroroute.storage.artifacts import verify_derived
+from aeroroute.cli.build_data_access import main
 
 
 class PilotPathTests(AccessFixture):
