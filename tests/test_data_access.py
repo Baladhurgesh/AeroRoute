@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from access_fixtures import AccessFixture, flight_row
 from aeroroute.storage.dataset import DatasetStore
-from aeroroute.storage.lookup import build_lookup
+from aeroroute.storage.lookup import build_lookup, index_plan
 from aeroroute.storage.artifacts import contained_path, verify_dataset, verify_derived
 from aeroroute.storage.identity import load_json
 
@@ -90,7 +90,7 @@ class DataAccessTests(AccessFixture):
     def test_wrong_physical_row_is_rejected(self):
         store = self.open_store()
         first, second = tuple(store.source_refs("historical"))
-        other, _ = store.raw(store.get(second).flight["source_record_id"])
+        other, _ = store.raw_at(second.source_sha256, second.csv_member, second.source_row_id)
         with patch.object(store.cache, "row", return_value=other):
             with self.assertRaisesRegex(ValueError, "locator"):
                 store.get(first)
@@ -115,6 +115,11 @@ class DataAccessTests(AccessFixture):
         self.assertTrue(all(stop["landing"].value is None for stop in evidence.stops))
         self.assertEqual(store.cache_size_bytes, 0)
         self.assertEqual(len(store.handles), 1)
+
+    def test_contiguous_ordinals_use_one_range_and_gaps_stay_explicit(self):
+        self.assertEqual(index_plan([4, 5, 6]), ("range", 4, 6))
+        self.assertEqual(index_plan([4, 6, 5]), ("explicit", None, None))
+        self.assertEqual(index_plan([]), ("empty", None, None))
 
     def test_unknown_lookup_version_is_rejected(self):
         snapshot = self.snapshot()

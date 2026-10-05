@@ -122,7 +122,7 @@ def verify_derived(path, kind=None):
     }
     artifact_kind = identity.get("kind")
     version_field = "lookup_version" if artifact_kind == "lookup" else "builder_version"
-    supported_versions = (1, 2) if artifact_kind in ("lookup", "services") else (1,)
+    supported_versions = (1, 2, 3) if artifact_kind in ("lookup", "services") else (1, 2) if artifact_kind in ("schedule", "pools") else (1,)
     if artifact_kind not in required or (artifact_kind != "pilot" and identity.get(version_field) not in supported_versions):
         raise ValueError("Unsupported derived artifact version")
     verify_artifacts(path, manifest["artifacts"], required[artifact_kind])

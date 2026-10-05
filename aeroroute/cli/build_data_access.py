@@ -70,11 +70,10 @@ def main(argv=None):
     existing = output
     while not existing.exists():
         existing = existing.parent
-    rows = sum(partition["source"]["row_count"] for partition in snapshot["partitions"])
-    required = rows * 2200 + 2 * 1024 ** 3
+    required = 3 * 1024 ** 3
     free = shutil.disk_usage(existing).free
     if free < required:
-        raise OSError(f"Conservative post-processing preflight requires {required:,} free bytes including staging/reserve; only {free:,} available. Use a larger output volume or a smaller explicit snapshot.")
+        raise OSError(f"Post-processing needs {required:,} free bytes of scratch space; only {free:,} available. The normalized Parquet is already stored and is not copied.")
     print("Preparing verified source and stop lookup", flush=True)
     lookup = build_lookup(args.snapshot, output / "lookups")
     with ExitStack() as stack:

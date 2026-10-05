@@ -81,6 +81,21 @@ class SamplingTests(AccessFixture):
             empirical.sample(next(schedule.all_flights()))
         self.assertEqual(empirical.pools.report["unsupported"]["fraction"], 1)
 
+    def test_unresolved_services_are_omitted_from_pools(self):
+        rows = [flight_row(), flight_row(Operating_Airline="XX"), flight_row("2020-01-02"),
+                flight_row("2024-08-25", Operating_Airline="F9", Marketing_Airline_Network="F9",
+                           Flight_Number_Operating_Airline="", Flight_Number_Marketing_Airline="",
+                           Origin="MIA", OriginAirportID="13303", OriginStateName="Florida",
+                           Dest="ATL", DestAirportID="10397", DestStateName="Georgia",
+                           CRSDepTime="0600", CRSArrTime="0807", CRSElapsedTime="127"),
+                flight_row("2025-01-01")]
+        empirical, replay, schedule = self.providers(rows)
+        self.assertFalse(empirical.pools.catalog.ready("historical", evidence=False))
+        self.assertEqual(empirical.pools.manifest["identity"]["membership"], "omit-unresolved-services-v1")
+        result = empirical.sample(next(schedule.all_flights()))
+        self.assertEqual(result.historical_sample.matching_pool_size, 1)
+        self.assertEqual(result.historical_sample.flight_date.isoformat(), "2020-01-02")
+
     def test_fitting_scope_cannot_include_heldout_year(self):
         empirical, replay, schedule = self.providers()
         with self.assertRaises(ValueError):
@@ -132,6 +147,17 @@ class SamplingTests(AccessFixture):
         self.assertEqual(report["request_count"], 2)
         self.assertEqual(report["unique_service_count"], 1)
         self.assertEqual(report["unsupported"]["count"], 0)
+
+    def test_membership_cache_preserves_scenario_identity_and_draw(self):
+        empirical, replay, schedule = self.providers()
+        scenario = empirical.scenario.sha256
+        flight = next(schedule.all_flights())
+        first = empirical.sample(flight, episode_id="policy-a", step_index=1)
+        self.assertTrue(empirical.pools.cache_path.exists())
+        second = empirical.sample(flight, episode_id="policy-b", step_index=4)
+        self.assertEqual(first.evidence, second.evidence)
+        self.assertEqual(first.receipt.draw, second.receipt.draw)
+        self.assertEqual(empirical.scenario.sha256, scenario)
 
     def test_rejection_algorithm_retries_without_modulo_bias(self):
         class FakeHash:
