@@ -14,6 +14,16 @@ Python 3.11 or newer. The `rl` extra installs Gymnasium and NumPy, which the tra
 
 Raw and processed data stay under `data/` and are not in Git.
 
+## Get the processed data
+
+The snapshot, lookup, service catalog, 2025 schedule, replay map, 2020–2024 pools, pilots, and example episodes are published at `s3://simpleclosure/aeroroute/data/processed`. The download is about 18 GB. Raw monthly ZIPs are not included.
+
+```bash
+aws s3 sync --no-sign-request s3://simpleclosure/aeroroute/data/processed data/processed
+```
+
+The commands below use those paths. Re-running `build_data_access --stage pilot` rebuilds them instead of using this copy.
+
 ## Flow
 
 ```text
